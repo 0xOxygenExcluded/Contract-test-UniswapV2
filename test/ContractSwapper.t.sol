@@ -19,7 +19,9 @@ contract ContractSwapperTest is Test {
         assertEq(owner.balance, 1 ether);
     }
 
-    function test_SwapExactETHForTokens() public { 
+    function test_SwapExactETHForTokens() public {
+        vm.prank(owner);
         swapper.swapExactETHForTokens{value: owner.balance}(USDC);
+        assertEq(owner.balance, 0 ether);
     }
 }
