@@ -9,6 +9,9 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  
 
 contract ContractSwapperTest is Test {
+    uint256 mainnetFork;
+    string MAINNET_RPC_URL = vm.envString("MAINNET_RPC_URL");
+
     ContractSwapper public swapper;
 
     address payable owner = payable(makeAddr("owner"));
@@ -19,6 +22,9 @@ contract ContractSwapperTest is Test {
 
 
     function setUp() public {
+        mainnetFork = vm.createFork(MAINNET_RPC_URL);
+        vm.selectFork(mainnetFork);
+
         swapper = new ContractSwapper(uniswapV2router02, owner);
         vm.deal(owner, 1 ether);
         vm.deal(regularUser, 2 ether);
@@ -42,7 +48,7 @@ contract ContractSwapperTest is Test {
         assertNotEq(USDCIERC20.balanceOf(address(swapper)), 0);
     }
 
-    
+
     function test_RecieveETH() public {
         uint256 contractBalance = address(swapper).balance;
 
