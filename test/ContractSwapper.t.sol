@@ -17,15 +17,17 @@ contract ContractSwapperTest is Test {
     address payable owner = payable(makeAddr("owner"));
     address payable regularUser = payable(makeAddr("regularUser"));
 
-    address uniswapV2router02 = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
     address USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    address WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    address uniswapV2router02 = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
+    address swapRouter = 0xE592427A0AEce92De3Edee1F18E0157C05861564;
 
 
     function setUp() public {
         mainnetFork = vm.createFork(MAINNET_RPC_URL);
         vm.selectFork(mainnetFork);
 
-        swapper = new ContractSwapper(uniswapV2router02, owner);
+        swapper = new ContractSwapper(uniswapV2router02, owner, swapRouter);
         vm.deal(owner, 1 ether);
         vm.deal(regularUser, 2 ether);
     }
@@ -101,5 +103,22 @@ contract ContractSwapperTest is Test {
 
         swapper.withdrawToken(USDC, regularUser, 10**5);
         vm.stopPrank();
+    }
+
+
+    function testFuzz_ExactInputSingle(uint128 initialBalance, uint64 amountIn) public {
+        // vm.assumeNoRevert();
+        vm.assume(initialBalance >= amountIn);
+        vm.assume(amountIn > 0.1 ether);
+        vm.deal(owner, initialBalance);
+        
+        deal(WETH, owner, initialBalance);
+
+        vm.prank(owner);
+        IERC20(WETH).approve(address(swapper), type(uint256).max);
+        vm.prank(owner);
+
+        swapper.exactInputSingle{value: amountIn}(USDC, 1, amountIn);
+        assertEq(owner.balance + amountIn, initialBalance);
     }
 }
