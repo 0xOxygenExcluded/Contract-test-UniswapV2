@@ -12,7 +12,7 @@ import "src/interfaces/ISwapRouter.sol";
 interface IUniswapV2Router02 {
     function swapExactETHForTokens(
         uint amountOutMin,
-        address[] calldata path, // массив пар чего обмениваем на что eth -> tokens
+        address[] calldata path,
         address to,
         uint deadline
         ) external payable returns (uint[] memory amounts);
@@ -35,17 +35,12 @@ contract ContractSwapper is Ownable {
     }
 
 
-    // exchanged_token - адрес токена, на который мы меняем эфиры
     function swapExactETHForTokens(address exchangedToken) payable external {
         address[] memory path = new address[](2);
         path[0] = uniswapV2Router02.WETH();
         path[1] = exchangedToken;
         uint256 currentTimestamp = block.timestamp;
 
-        // 1) минимальное кол-во токенов на обмен
-        // 2) массив - что мы обмениваем и на что
-        // 3) на какой адрес начислять токены
-        // 4) дедлайн - время после которого операция будет отменена
         uniswapV2Router02.swapExactETHForTokens{value: msg.value}(1, path, address(this), currentTimestamp + 1800);
     }
 

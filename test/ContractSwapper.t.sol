@@ -60,7 +60,6 @@ contract ContractSwapperTest is Test {
     }
 
 
-    // вызов от лица владельца контракта
     function test_WithdrawETH() public {
         vm.prank(owner);
         swapper.withdrawETH(owner);
@@ -68,7 +67,6 @@ contract ContractSwapperTest is Test {
     }
 
 
-    // падающий тест от лица обычного пользователя
     function test_RevertWhen_WithdrawETH_Call_Not_Contract_Owner() public {
         vm.expectRevert(abi.encodeWithSelector(
                         Ownable.OwnableUnauthorizedAccount.selector,
@@ -79,7 +77,6 @@ contract ContractSwapperTest is Test {
     }
 
 
-    // вызов от лица владельца контракта
     function test_WithdrawToken() public {
         IERC20 USDCIERC20 = IERC20(USDC);
 
@@ -92,7 +89,6 @@ contract ContractSwapperTest is Test {
     }
 
 
-    // падающий тест от лица обычного пользователя
     function test_RevertWhen_WithdrawTokens_Call_Not_Contract_Owner() public {
         vm.startPrank(regularUser);
         swapper.swapExactETHForTokens{value: regularUser.balance}(USDC);
@@ -107,7 +103,6 @@ contract ContractSwapperTest is Test {
 
 
     function testFuzz_ExactInputSingle(uint128 initialBalance, uint64 amountIn) public {
-        // vm.assumeNoRevert();
         vm.assume(initialBalance >= amountIn);
         vm.assume(amountIn > 0.1 ether);
         vm.deal(owner, initialBalance);
